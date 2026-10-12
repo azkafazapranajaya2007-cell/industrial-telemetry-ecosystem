@@ -1,0 +1,9 @@
+backend/venv/
+dashboard/venv/
+__pycache__/
+backend/__pycache__/
+dashboard/__pycache__/
+*.pyc
+backend/data/*.db
+.env
+.DS_Store
