@@ -27,6 +27,13 @@ try:
     if response.status_code == 200:
         result = response.json()
         logs = result.get("data", [])
+        alerts = result.get("alerts", [])
+        
+        # Fitur 1 Visual: Tampilkan Alert jika ada insiden terdeteksi
+        if alerts:
+            st.sidebar.subheader("🚨 Incident Alerts")
+            for alert in alerts[:3]:
+                st.sidebar.error(f"[{alert['triggered_at']}] {alert['message']}")
         
         if logs:
             df = pd.DataFrame(logs)
@@ -44,6 +51,26 @@ try:
             st.subheader("📈 Live Pressure & RPM Chart")
             st.line_chart(df[['pressure_bar', 'conveyor_rpm']])
             
+            # Fitur 2: Export Data
+            st.sidebar.divider()
+            st.sidebar.subheader("📥 Export Telemetry Data")
+            
+            csv_data = df.to_csv(index=False).encode('utf-8')
+            st.sidebar.download_button(
+                label="Download CSV",
+                data=csv_data,
+                file_name="telemetry_data.csv",
+                mime="text/csv",
+            )
+            
+            json_data = df.to_json(orient="records", indent=2)
+            st.sidebar.download_button(
+                label="Download JSON",
+                data=json_data,
+                file_name="telemetry_data.json",
+                mime="application/json",
+            )
+            
             # Tabel Log Mentah
             st.subheader("📋 Raw Telemetry Logs")
             st.dataframe(df, use_container_width=True)
@@ -54,6 +81,6 @@ try:
 except Exception as e:
     st.error(f"Gagal terhubung ke API Gateway ({BACKEND_URL}): {e}")
 
-# Auto-refresh logic via streamlit-autorefresh atau rerun sederhana
+# Auto-refresh logic
 if auto_refresh:
     st.rerun()
