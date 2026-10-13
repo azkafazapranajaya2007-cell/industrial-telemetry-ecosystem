@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  telemetry-api:
+    build: .
+    container_name: zenith_telemetry_gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    restart: always
